@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diary</title>
+  </head>
+  <body>
+    <ul id="diaryList"></ul>
+
+    <script>
+      // Wrap the code in an async function
+      (async () => {
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem("token");
+
+        // Check if the token exists
+        if (token) {
+          try {
+            // Make a fetch request with the token
+            const response = await fetch("http://localhost:5000/api/v1/diary", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            const { diary } = await response.json();
+
+            // Render the diary entries using map
+            const diaryList = document.getElementById("diaryList");
+            diaryList.innerHTML = diary
+              .map(
+                (entry) => `
+                  <li><strong>Title</strong>: ${entry.title}</li>
+                  <li><strong>Content</strong>: ${entry.content}</li>
+                  <li><strong>Date</strong>: ${formatDate(entry.date)}</li>
+                  <br />
+                `
+              )
+              .join("");
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        } else {
+          console.error("Token not found.");
+        }
+      })();
+
+      // Function to format the date
+      function formatDate(dateString) {
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        const formattedDate = new Date(dateString).toLocaleDateString(
+          "en-US",
+          options
+        );
+        return formattedDate;
+      }
+    </script>
+  </body>
+</html>

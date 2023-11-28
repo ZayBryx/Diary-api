@@ -27,9 +27,18 @@ const userSchema = new mongoose.Schema({
     require: [true, "please provide password"],
     minlength: 6,
   },
+  resetToken: {
+    type: String,
+    default: undefined,
+  },
+  tokenExpires: {
+    type: Date,
+    default: undefined,
+  },
 });
 
 userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
@@ -47,6 +56,10 @@ userSchema.methods.genToken = function () {
 userSchema.methods.comparePassword = async function (password) {
   const isMatch = await bcrypt.compare(password, this.password);
   return isMatch;
+};
+
+userSchema.methods.genString = function () {
+  return require("crypto").randomBytes(20).toString("hex");
 };
 
 module.exports = mongoose.model("User", userSchema);

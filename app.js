@@ -33,6 +33,7 @@ const errorHandlerMiddleware = require("./middleware/error-handler");
 //routes
 const authRouter = require("./routes/auth");
 const diaryRouter = require("./routes/Diary");
+const settingRoute = require("./routes/settings");
 
 app.get("/", (req, res) => {
   res.send("Diary API");
@@ -40,10 +41,11 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/diary", authUser, diaryRouter);
+app.use("/api/v1/settings", authUser, settingRoute);
 
 //middlewares
-app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
+app.use(notFoundMiddleware);
 
 const start = async (req, res) => {
   await connectDB(db_uri);
